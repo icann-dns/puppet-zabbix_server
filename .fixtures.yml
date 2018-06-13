@@ -3,4 +3,10 @@
 ---
 fixtures:
   forge_modules:
-#     stdlib: "puppetlabs/stdlib"
+     stdlib: "puppetlabs/stdlib"
+     apache: "puppetlabs/apache"
+     inifile: "puppetlabs/inifile"
+     mysql: "puppetlabs/mysql"
+     concat: "puppetlabs/concat"
+     sysctl: "thias/sysctl"
+     python: "stankevich/python"
