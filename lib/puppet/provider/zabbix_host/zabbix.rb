@@ -11,8 +11,8 @@ Puppet::Type.type(:zabbix_host).provide(:zabbix) do
 
   def self.prefetch(resources)
     instances.each do |prov|
-      if @resource == resources[prov.name]
-        @resource.provider = prov
+      if resource = resources[prov.name]
+        resource.provider = prov
       end
     end
   end
