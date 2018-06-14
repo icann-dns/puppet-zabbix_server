@@ -73,39 +73,38 @@ node /\.servers\.example\.com$/ {
 
 ## Reference
 
-This section is deprecated. Instead, add reference information to your code as Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your module. For details on how to add code comments and generate documentation with Strings, see the Puppet Strings [documentation](https://puppet.com/docs/puppet/latest/puppet_strings.html) and [style guide](https://puppet.com/docs/puppet/latest/puppet_strings_style.html)
+### Classes
 
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the root of your module directory and list out each of your module's classes, defined types, facts, functions, Puppet tasks, task plans, and resource types and providers, along with the parameters for each.
+#### zabbix_server
 
-For each element (class, defined type, function, and so on), list:
+* `db_host` (Stdlib::Host, Default: 'localhost'): The database server name
+* `db_port` (Stdlib::Port, Default: 3306): The database server port
+* `db_name` (String, Default: 'zabbix'): The name of the database
+* `db_user` (String, Default: 'zabbix'): The username to use for creating the databaser
+* `db_password` (String, Default: 'changeme'): The password to use for creating the databaser
+* `php_timezone` (String, Default: 'UTC'): The timezone to use in php
+* `zabbix_host` (Stdlib::Host, Default: $::fqdn): The zabbix host fqdn used for vhosts
+* `zabbix_port` (Stdlib::Port, Default: 10051): The port zabbix will use to pole 
+* `cache_size` (String, Default: '128M'):  Memory allocation params
+* `value_cache_size` (String, Default: '256M'): Memory allocation params
+* `log_file` (Stdlib::Absolutepath, Default: '/var/log/zabbix/zabbix\_server.log'): log file location
+* `pollers` (Integer[11000], Default: 100): Number of pollers
+* `pingers` (Integer[11000], Default: 10): Number of Pingers
+* `pollers_unreachable` (Integer[11000], Default: 25): How many unreachable Pollers
+* `trappers` (Integer[11000], Default: 25): Number of trappers
+* `timeout` (Integer[130], Default: 3): The zabbix agent time out value
+* `approot` (Stdlib::Absolutepath, Default: '/srv/www'): Apache web root
+* `api_user` (String, Default: 'user'): user to use for API calls
+* `api_password` (String, Default: 'password'): Password to use for API calls
+* `admin_password` (String, Default: 'zabbix'): Admin password for zabbix
+* `default_group_ids` (Integer, Default: 2): default group ids to use when creating hosts
+* `default_template_ids` (Integer, Default: 10001): Default template id to use when creatng hosts
 
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
+### Types
 
-For example:
+#### zabbix\_host
 
-```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
-```
-
-## Limitations
-
-In the Limitations section, list any incompatibilities, known issues, or other warnings.
-
-## Development
-
-In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
-
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
+* `host (namevar)` (%r{[\w\-\.]+}): the host name to use for the zabbix host.  the IP addresses of this host wiull be lookedup and added to the host definition as its created
+* `operational` (Boolean): This indecates to zabbix if the host is operational or not
+* `groupids` (Array[Integer]): Group IDs to add specific host to
+* `templateids` (Array[Integer]): Template IDs to add specific host to
