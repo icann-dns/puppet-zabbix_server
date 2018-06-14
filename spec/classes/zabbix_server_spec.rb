@@ -10,7 +10,7 @@ describe 'zabbix_server' do
       # db_user: "zabbix",
       # db_password: "changeme",
       # php_timezone: "UTC",
-      zabbix_host: "zabbix-server.example.com",
+      zabbix_host: 'zabbix-server.example.com',
       # zabbix_port: "10051",
       # cache_size: "128M",
       # value_cache_size: "256M",
@@ -143,13 +143,13 @@ describe 'zabbix_server' do
             ensure: 'file',
             mode: '0500',
           ).with_content(
-            %r{'--user', default='user'}
+            %r{'--user', default='user'},
           ).with_content(
-            %r{'--password', default='password'}
+            %r{'--password', default='password'},
           ).with_content(
-            %r{'--group-ids', default='2'}
+            %r{'--group-ids', default='2'},
           ).with_content(
-            %r{'--template-ids', default='10001'}
+            %r{'--template-ids', default='10001'},
           )
         end
         it do
@@ -157,13 +157,13 @@ describe 'zabbix_server' do
             ensure: 'file',
             mode: '0550',
           ).with_content(
-            %r{NEW_PASSWORD\s+=\s+'zabbix'}
+            %r{NEW_PASSWORD\s+=\s+'zabbix'},
           ).with_content(
-            %r{API_USER\s+=\s+'user'}
+            %r{API_USER\s+=\s+'user'},
           ).with_content(
-            %r{API_PASSWORD\s+=\s+'password'}
+            %r{API_PASSWORD\s+=\s+'password'},
           ).with_content(
-            %r{ZABBIX_HOST\s+=\s+'http://zabbix-server.example.com'}
+            %r{ZABBIX_HOST\s+=\s+'http://zabbix-server.example.com'},
           )
         end
         it do
@@ -172,7 +172,7 @@ describe 'zabbix_server' do
             require: 'Package[zabbix-frontend-php]',
             notify: 'Service[apache2]',
           ).with_content(
-            %r{php_value date.timezone UTC}
+            %r{php_value date.timezone UTC},
           )
         end
         it do
@@ -180,21 +180,21 @@ describe 'zabbix_server' do
             ensure: 'file',
             require: 'Package[zabbix-frontend-php]',
           ).with_content(
-            %r{\$DB\['SERVER'\]\s+=\s+'localhost';}
+            %r{\$DB\['SERVER'\]\s+=\s+'localhost';},
           ).with_content(
-            %r{\$DB\['PORT'\]\s+=\s+'3306';}
+            %r{\$DB\['PORT'\]\s+=\s+'3306';},
           ).with_content(
-            %r{\$DB\['DATABASE'\]\s+=\s+'zabbix';}
+            %r{\$DB\['DATABASE'\]\s+=\s+'zabbix';},
           ).with_content(
-            %r{\$DB\['USER'\]\s+=\s+'zabbix';}
+            %r{\$DB\['USER'\]\s+=\s+'zabbix';},
           ).with_content(
-            %r{\$DB\['PASSWORD'\]\s+=\s+'changeme';}
+            %r{\$DB\['PASSWORD'\]\s+=\s+'changeme';},
           ).with_content(
-            %r{\$ZBX_SERVER\s+=\s+'zabbix-server.example.com';}
+            %r{\$ZBX_SERVER\s+=\s+'zabbix-server.example.com';},
           ).with_content(
-            %r{\$ZBX_SERVER_PORT\s+=\s+'10051';}
+            %r{\$ZBX_SERVER_PORT\s+=\s+'10051';},
           ).with_content(
-            %r{\$ZBX_SERVER_NAME\s+=\s+'zabbix-server.example.com';}
+            %r{\$ZBX_SERVER_NAME\s+=\s+'zabbix-server.example.com';},
           )
         end
         it do
@@ -208,7 +208,7 @@ describe 'zabbix_server' do
         end
         it do
           is_expected.to contain_apache__vhost(
-            'zabbix-server.example.com non-ssl'
+            'zabbix-server.example.com non-ssl',
           ).with(
             servername: 'zabbix-server.example.com',
             docroot: '/srv/www/',
@@ -243,9 +243,9 @@ describe 'zabbix_server' do
           it { is_expected.to contain_mysql__db('zabbix').with_host('foo.bar') }
           it do
             is_expected.to contain_file(
-              '/etc/zabbix/web/zabbix.conf.php'
+              '/etc/zabbix/web/zabbix.conf.php',
             ).with_content(
-              %r{\$DB\['SERVER'\]\s+=\s+'foo.bar';}
+              %r{\$DB\['SERVER'\]\s+=\s+'foo.bar';},
             )
           end
           it do
@@ -260,9 +260,9 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/etc/zabbix/web/zabbix.conf.php'
+              '/etc/zabbix/web/zabbix.conf.php',
             ).with_content(
-              %r{\$DB\['PORT'\]\s+=\s+'42';}
+              %r{\$DB\['PORT'\]\s+=\s+'42';},
             )
           end
           it do
@@ -284,9 +284,9 @@ describe 'zabbix_server' do
           end
           it do
             is_expected.to contain_file(
-              '/etc/zabbix/web/zabbix.conf.php'
+              '/etc/zabbix/web/zabbix.conf.php',
             ).with_content(
-              %r{\$DB\['DATABASE'\]\s+=\s+'foobar';}
+              %r{\$DB\['DATABASE'\]\s+=\s+'foobar';},
             )
           end
           it do
@@ -302,9 +302,9 @@ describe 'zabbix_server' do
           it { is_expected.to contain_mysql__db('zabbix').with_user('foobar') }
           it do
             is_expected.to contain_file(
-              '/etc/zabbix/web/zabbix.conf.php'
+              '/etc/zabbix/web/zabbix.conf.php',
             ).with_content(
-              %r{\$DB\['USER'\]\s+=\s+'foobar';}
+              %r{\$DB\['USER'\]\s+=\s+'foobar';},
             )
           end
         end
@@ -316,9 +316,9 @@ describe 'zabbix_server' do
           end
           it do
             is_expected.to contain_file(
-              '/etc/zabbix/web/zabbix.conf.php'
+              '/etc/zabbix/web/zabbix.conf.php',
             ).with_content(
-              %r{\$DB\['PASSWORD'\]\s+=\s+'foobar';}
+              %r{\$DB\['PASSWORD'\]\s+=\s+'foobar';},
             )
           end
           it do
@@ -337,7 +337,7 @@ describe 'zabbix_server' do
               require: 'Package[zabbix-frontend-php]',
               notify: 'Service[apache2]',
             ).with_content(
-              %r{php_value date.timezone Foo/Bar}
+              %r{php_value date.timezone Foo/Bar},
             )
           end
         end
@@ -346,16 +346,16 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/etc/zabbix/web/zabbix.conf.php'
+              '/etc/zabbix/web/zabbix.conf.php',
             ).with_content(
-              %r{\$ZBX_SERVER\s+=\s+'foo.bar';}
+              %r{\$ZBX_SERVER\s+=\s+'foo.bar';},
             )
           end
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_reset.py'
+              '/usr/local/bin/zabbix_reset.py',
             ).with_content(
-              %r{ZABBIX_HOST\s+=\s+'http://foo.bar'}
+              %r{ZABBIX_HOST\s+=\s+'http://foo.bar'},
             )
           end
         end
@@ -364,9 +364,9 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/etc/zabbix/web/zabbix.conf.php'
+              '/etc/zabbix/web/zabbix.conf.php',
             ).with_content(
-              %r{\$ZBX_SERVER_PORT\s+=\s+'42';}
+              %r{\$ZBX_SERVER_PORT\s+=\s+'42';},
             )
           end
         end
@@ -455,12 +455,12 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_apache__vhost(
-              'zabbix-server.example.com non-ssl'
+              'zabbix-server.example.com non-ssl',
             ).with_docroot('/foo/bar/')
           end
           it do
             is_expected.to contain_apache__vhost(
-              'zabbix-server.example.com'
+              'zabbix-server.example.com',
             ).with_docroot('/foo/bar/')
           end
         end
@@ -469,16 +469,16 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_host.py'
+              '/usr/local/bin/zabbix_host.py',
             ).with_content(
-              %r{'--user', default='foobar'}
+              %r{'--user', default='foobar'},
             )
           end
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_reset.py'
+              '/usr/local/bin/zabbix_reset.py',
             ).with_content(
-              %r{API_USER\s+=\s+'foobar'}
+              %r{API_USER\s+=\s+'foobar'},
             )
           end
         end
@@ -487,16 +487,16 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_host.py'
+              '/usr/local/bin/zabbix_host.py',
             ).with_content(
-              %r{'--password', default='foobar'}
+              %r{'--password', default='foobar'},
             )
           end
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_reset.py'
+              '/usr/local/bin/zabbix_reset.py',
             ).with_content(
-              %r{API_PASSWORD\s+=\s+'foobar'}
+              %r{API_PASSWORD\s+=\s+'foobar'},
             )
           end
         end
@@ -505,9 +505,9 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_reset.py'
+              '/usr/local/bin/zabbix_reset.py',
             ).with_content(
-              %r{NEW_PASSWORD\s+=\s+'foobar'}
+              %r{NEW_PASSWORD\s+=\s+'foobar'},
             )
           end
         end
@@ -516,9 +516,9 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_host.py'
+              '/usr/local/bin/zabbix_host.py',
             ).with_content(
-              %r{'--group-ids', default='42'}
+              %r{'--group-ids', default='42'},
             )
           end
         end
@@ -527,9 +527,9 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_host.py'
+              '/usr/local/bin/zabbix_host.py',
             ).with_content(
-              %r{'--template-ids', default='42'}
+              %r{'--template-ids', default='42'},
             )
           end
         end
