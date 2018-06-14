@@ -1,16 +1,6 @@
 
 # zabbix_server
 
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/pdk/latest/pdk_generating_modules.html .
-
-The README template below provides a starting point with details about what information to include in your README.
-
-
-
-
-
-
-
 #### Table of Contents
 
 1. [Description](#description)
@@ -24,36 +14,62 @@ The README template below provides a starting point with details about what info
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your module does and what kind of problems users can solve with it.
-
-This should be a fairly short description helps the user decide if your module is what they want.
-
+This module installas and manages the zabbix server.  It also adds a custom type which allows users to add zabbix hosts via the zabbix API.
 
 ## Setup
 
-### What zabbix_server affects **OPTIONAL**
+### What zabbix\_server affects
 
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
+This module installs a a number of scripts to help the providers work
 
-If there's more that they should know about, though, this is the place to mention:
+* /usr/local/bin/zabbix\_host.py
+* /usr/local/bin/zabbix\_reset.py
 
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
+This module also requires the apache module to configuer the zabbix vhost
 
-### Setup Requirements **OPTIONAL**
+### Setup Requirements
 
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
+* This modules needs to `zabbix (0.9.8)` installed on the puppet master. 
 
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
+you can install this manully with 
+```bash
+sudo pupetserver gem install zabbix -v 0.9.8
+```
 
-### Beginning with zabbix_server
+or using the `puppetlabs-puppetserver_gem` module
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+```puppet
+package {'zabbix':
+  ensure => '0.9.8',
+  provider => puppetserver_gem,
+}
+```
+
+### Beginning with zabbix\_server
+
+You should be able to just `include zabbix` to get a basic server up and running.  you can add hosts and sites using the `zabbix_site` and `zabbix_host` types.
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
+A simple example would be to have all nodes allooceted to one zabbix group and template.  Unfortunatly we need to use the template id number and not the description, also this module tose not manage the group and template creation
+
+
+zabbix.example.com manifest
+```puppet
+node 'zabbix.example.com' {
+  include zabbix
+  Zabbix_host <<||>>
+}
+
+node /\.servers\.example\.com$/ {
+  @@zabbix_host {$::trusted['certname']:
+    ensure      => present,
+    operational => true,
+    groupids    => ['1',]
+    templateids => ['10001',]
+  }
+}
+```
 
 ## Reference
 
