@@ -1,7 +1,11 @@
 require 'json'
+
+# check out the following blog serious for info on greating type/providers
+# http://garylarizza.com/blog/2013/12/15/seriously-what-is-this-provider-doing/
 Puppet::Type.type(:zabbix_host).provide(:zabbix) do
   commands zabbix_host: '/usr/local/bin/zabbix_host.py'
   defaultfor kernel: 'Linux'
+  # create getters and setters
   mk_resource_methods
 
   def initialize(value = {})
@@ -9,14 +13,19 @@ Puppet::Type.type(:zabbix_host).provide(:zabbix) do
     @property_flush = {}
   end
 
+  # like self.instances for `puppet apply/puppet agent`
+  # argument is a hash of all managed resources
   def self.prefetch(resources)
     instances.each do |prov|
-      if resource = resources[prov.name]
+      # read the blog post refrenced above from the bit the title
+      # "What the actual fuck?!" to understand this bit
+      if resource = resources[prov.name] # rubocop:disable Lint/AssignmentInCondition
         resource.provider = prov
       end
     end
   end
 
+  # Get all the current values i.e. `puppet resource nexpose_host`
   def self.instances
     JSON.parse(zabbix_host('--exists')).map do |host|
       # Puppet.debug("collecting #{host['host']}")
