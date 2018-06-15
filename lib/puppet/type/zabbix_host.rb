@@ -32,11 +32,17 @@ Puppet::Type.newtype(:zabbix_host) do
   newproperty(:groupids, array_matching: :all) do
     desc 'groups ids this host is a member of'
     newvalues(%r{\d+})
+    def insync?(is)
+      is.sort == should.sort
+    end
   end
 
   newproperty(:templateids, array_matching: :all) do
     desc 'groups ids this host is a member of'
     newvalues(%r{\d+})
+    def insync?(is)
+      is.sort == should.sort
+    end
   end
 
   # Borrowed from ipaddress library
