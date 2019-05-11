@@ -227,7 +227,7 @@ describe 'zabbix_server' do
             ssl_key: '/etc/ssl/private/wildcard.dns.icann.org.key',
             ssl_chain: '/etc/ssl/certs/DigiCertCA.crt',
             ssl_protocol: '-all +TLSv1.2',
-            ssl_cipher: 'HIGH:!aNULL:!MD5'
+            ssl_cipher: 'HIGH:!aNULL:!MD5',
           )
         end
         it do
