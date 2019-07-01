@@ -139,8 +139,8 @@ class zabbix_server (
       ssl_cert             => '/etc/ssl/certs/wildcard.dns.icann.org.crt',
       ssl_key              => '/etc/ssl/private/wildcard.dns.icann.org.key',
       ssl_chain            => '/etc/ssl/certs/DigiCertCA.crt',
-      ssl_protocol         => %{alias('apache::mod::ssl::ssl_protocol:')},
-      ssl_cipher           => %{alias('apache::mod::ssl::ssl_cipher:')},
+      ssl_protocol         => '-all +TLSv1.2',
+      ssl_cipher           => 'EECDH+AESGCM:EDH+AESGCM',
       ssl_stapling         => true,
       ssl_honorcipherorder => 'on',
   }
