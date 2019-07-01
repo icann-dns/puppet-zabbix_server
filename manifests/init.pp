@@ -131,14 +131,18 @@ class zabbix_server (
       port                => 80,
       additional_includes => ['/etc/zabbix/apache.conf',];
     $zabbix_host:
-      servername          => $zabbix_host,
-      docroot             => "${approot}/",
-      port                => 443,
-      additional_includes => ['/etc/zabbix/apache.conf',],
-      ssl                 => true,
-      ssl_cert            => '/etc/ssl/certs/wildcard.dns.icann.org.crt',
-      ssl_key             => '/etc/ssl/private/wildcard.dns.icann.org.key',
-      ssl_chain           => '/etc/ssl/certs/DigiCertCA.crt',
+      servername           => $zabbix_host,
+      docroot              => "${approot}/",
+      port                 => 443,
+      additional_includes  => ['/etc/zabbix/apache.conf',],
+      ssl                  => true,
+      ssl_cert             => '/etc/ssl/certs/wildcard.dns.icann.org.crt',
+      ssl_key              => '/etc/ssl/private/wildcard.dns.icann.org.key',
+      ssl_chain            => '/etc/ssl/certs/DigiCertCA.crt',
+      ssl_protocol         => "%{alias('apache::mod::ssl::ssl_protocol:')}",
+      ssl_cipher           => "%{alias('apache::mod::ssl::ssl_cipher:')}",
+      ssl_stapling         => true,
+      ssl_honorcipherorder => 'on',
   }
   exec {'/usr/local/bin/zabbix_reset.py':
     command => '/usr/local/bin/zabbix_reset.py && touch /etc/zabbix/api_created',
