@@ -25,6 +25,7 @@ class zabbix_server (
   String               $admin_password           = 'zabbix',
   Integer              $default_group_ids        = 2,
   Integer              $default_template_ids     = 10001,
+  Integer              $kernel_shmmax            = 268435456,
 ) {
 
   ensure_packages([
@@ -97,7 +98,7 @@ class zabbix_server (
       value   => $timeout;
   }
   sysctl {'kernel.shmmax':
-    value => '268435456',
+    value => $kernel_shmmax,
   }
   service {'zabbix-server':
     ensure  => running,
