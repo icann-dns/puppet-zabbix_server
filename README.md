@@ -86,6 +86,8 @@ node /\.servers\.example\.com$/ {
 * `zabbix_host` (Stdlib::Host, Default: $::fqdn): The zabbix host fqdn used for vhosts
 * `zabbix_port` (Stdlib::Port, Default: 10051): The port zabbix will use to pole 
 * `cache_size` (String, Default: '128M'):  Memory allocation params
+* `history_index_cache_size` (String, Default: '16M'): Memory allocation params
+* `trend_cache_size` (String, Default: '16M'): Memory allocation params
 * `value_cache_size` (String, Default: '256M'): Memory allocation params
 * `log_file` (Stdlib::Absolutepath, Default: '/var/log/zabbix/zabbix\_server.log'): log file location
 * `pollers` (Integer[11000], Default: 100): Number of pollers

@@ -1,28 +1,30 @@
 # == Class: zabbix_server
 #
 class zabbix_server (
-  Stdlib::Host         $db_host              = 'localhost',
-  Stdlib::Port         $db_port              = 3306,
-  String               $db_name              = 'zabbix',
-  String               $db_user              = 'zabbix',
-  String               $db_password          = 'changeme',
-  String               $php_timezone         = 'UTC',
-  Stdlib::Host         $zabbix_host          = $::fqdn,
-  Stdlib::Port         $zabbix_port          = 10051,
-  String               $cache_size           = '128M',
-  String               $value_cache_size     = '256M',
-  Stdlib::Absolutepath $log_file             = '/var/log/zabbix/zabbix_server.log',
-  Integer[1,1000]      $pollers              = 100,
-  Integer[1,1000]      $pingers              = 10,
-  Integer[1,1000]      $pollers_unreachable  = 25,
-  Integer[1,1000]      $trappers             = 25,
-  Integer[1,30]        $timeout              = 3,
-  Stdlib::Absolutepath $approot              = '/srv/www',
-  String               $api_user             = 'user',
-  String               $api_password         = 'password',
-  String               $admin_password       = 'zabbix',
-  Integer              $default_group_ids    = 2,
-  Integer              $default_template_ids = 10001,
+  Stdlib::Host         $db_host                  = 'localhost',
+  Stdlib::Port         $db_port                  = 3306,
+  String               $db_name                  = 'zabbix',
+  String               $db_user                  = 'zabbix',
+  String               $db_password              = 'changeme',
+  String               $php_timezone             = 'UTC',
+  Stdlib::Host         $zabbix_host              = $::fqdn,
+  Stdlib::Port         $zabbix_port              = 10051,
+  String               $cache_size               = '128M',
+  String               $history_index_cache_size = '16M',
+  String               $trend_cache_size         = '16M',
+  String               $value_cache_size         = '256M',
+  Stdlib::Absolutepath $log_file                 = '/var/log/zabbix/zabbix_server.log',
+  Integer[1,1000]      $pollers                  = 100,
+  Integer[1,1000]      $pingers                  = 10,
+  Integer[1,1000]      $pollers_unreachable      = 25,
+  Integer[1,1000]      $trappers                 = 25,
+  Integer[1,30]        $timeout                  = 3,
+  Stdlib::Absolutepath $approot                  = '/srv/www',
+  String               $api_user                 = 'user',
+  String               $api_password             = 'password',
+  String               $admin_password           = 'zabbix',
+  Integer              $default_group_ids        = 2,
+  Integer              $default_template_ids     = 10001,
 ) {
 
   ensure_packages([
@@ -66,6 +68,12 @@ class zabbix_server (
     'cache_size':
       setting => 'CacheSize',
       value   => $cache_size;
+    'history_index_cache_size':
+      setting => 'HistoryIndexCacheSize',
+      value   => $history_index_cache_size;
+    'trend_cache_size':
+      setting => 'TrendCacheSize',
+      value   => $trend_cache_size;
     'value_cache_size':
       setting => 'ValueCacheSize',
       value   => $value_cache_size;
