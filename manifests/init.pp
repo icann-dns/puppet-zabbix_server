@@ -17,6 +17,7 @@ class zabbix_server (
   Integer[1,1000]      $pollers                  = 5,
   Integer[1,1000]      $pingers                  = 1,
   Integer[1,1000]      $pollers_unreachable      = 1,
+  Integer[1,1000]      $proxy_pollers            = 1,
   Integer[1,1000]      $trappers                 = 5,
   Integer[1,30]        $timeout                  = 3,
   Stdlib::Absolutepath $approot                  = '/srv/www',
@@ -90,6 +91,9 @@ class zabbix_server (
     'pollers_unreachable':
       setting => 'StartPollersUnreachable',
       value   => $pollers_unreachable;
+    'proxy_pollers':
+      setting => 'StartProxyPollers',
+      value   => $proxy_pollers;
     'trappers':
       setting => 'StartTrappers',
       value   => $trappers;
