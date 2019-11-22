@@ -40,6 +40,8 @@ class zabbix_server (
     user           => $db_user,
     password       => $db_password,
     host           => $db_host,
+    charset        => 'utf8',
+    collate        => 'utf8_bin',
     grant          => ['all'],
     sql            => '/usr/share/doc/zabbix-server-mysql/create.sql.gz',
     require        => Package['zabbix-server-mysql'],
