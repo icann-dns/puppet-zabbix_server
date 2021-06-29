@@ -10,7 +10,7 @@ API_PASSWORD = '<%= @api_password %>'
 ZABBIX_HOST  = 'http://<%= @zabbix_host %>' 
 
 zapi = ZabbixAPI(ZABBIX_HOST)
-zapi.login('admin', DEFAULT_PASS)
+zapi.login('Admin', DEFAULT_PASS)
 usrgrps = zapi.user.get(userids=[1], selectUsrgrps=['usergroupid'])[0]['usrgrps']
 zapi.user.create(alias=API_USER, passwd=API_PASSWORD, usrgrps=usrgrps)
 zapi.user.update(userid=1, passwd=NEW_PASSWORD)

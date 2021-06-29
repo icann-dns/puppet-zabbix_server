@@ -4,6 +4,12 @@ import socket
 import argparse
 import sys
 import json
+# Uncomment for debugging
+#import logging
+#logger = logging.getLogger("pyzabbix")
+#logger.setLevel(logging.DEBUG)
+#handler = logging.StreamHandler(sys.stdout)
+#logger.addHandler(handler)
 
 
 def get_args():
@@ -24,21 +30,31 @@ def get_args():
 def get_interfaces(node):
     main = 1
     interfaces = []
+    snmp_details = {
+        'version': 2,
+        'community': '{$SNMP_COMMUNITY}'
+    } 
     for addr_info in socket.getaddrinfo(node, 80, 0, 0, socket.SOL_TCP):
-        for int_type in [1, 2]:
-            if int_type == 1:
-                port = 10050
-            else:
-                port = 161
+        if "drac" in node:
             interface = {
-                'type': int_type,
+                'type': 2,
                 'main': main,
                 'useip': 1,
                 'ip': addr_info[4][0],
                 'dns': node,
-                'port': port
+                'port': 161,
+                'details': snmp_details
             }
-            interfaces.append(interface)
+        else:
+            interface = {
+                'type': 1,
+                'main': main,
+                'useip': 1,
+                'ip': addr_info[4][0],
+                'dns': node,
+                'port': 10050
+            }
+        interfaces.append(interface)
         main = 0
     return interfaces
 
