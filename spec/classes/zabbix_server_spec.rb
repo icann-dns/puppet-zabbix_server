@@ -12,13 +12,13 @@ describe 'zabbix_server' do
       # php_timezone: "UTC",
       zabbix_host: 'zabbix-server.example.com',
       # zabbix_port: "10051",
-      # cache_size: "128M",
-      # value_cache_size: "256M",
+      # cache_size: "8M",
+      # value_cache_size: "8M",
       # log_file: "/var/log/zabbix/zabbix-server.log",
-      # pollers: "100",
-      # pingers: "10",
-      # pollers_unreachable: "25",
-      # trappers: "25",
+      # pollers: "5",
+      # pingers: "1",
+      # pollers_unreachable: "1",
+      # trappers: "5",
       # timeout: "3",
       # approot: "/srv/www",
       # api_user: "user",
@@ -39,7 +39,7 @@ describe 'zabbix_server' do
 
       describe 'check default config' do
         it { is_expected.to compile.with_all_deps }
-        it { is_expected.to contain_python__pip('pyzabbix').with_ensure('0.7.4') }
+        it { is_expected.to contain_python__pip('pyzabbix').with_ensure('0.8.2') }
         it do
           is_expected.to contain_mysql__db('zabbix').with(
             user: 'zabbix',
@@ -84,13 +84,13 @@ describe 'zabbix_server' do
         it do
           is_expected.to contain_ini_setting('cache_size').with(
             setting: 'CacheSize',
-            value: '128M',
+            value: '8M',
           )
         end
         it do
           is_expected.to contain_ini_setting('value_cache_size').with(
             setting: 'ValueCacheSize',
-            value: '256M',
+            value: '8M',
           )
         end
         it do
@@ -102,25 +102,25 @@ describe 'zabbix_server' do
         it do
           is_expected.to contain_ini_setting('pollers').with(
             setting: 'StartPollers',
-            value: '100',
+            value: '5',
           )
         end
         it do
           is_expected.to contain_ini_setting('pingers').with(
             setting: 'StartPingers',
-            value: '10',
+            value: '1',
           )
         end
         it do
           is_expected.to contain_ini_setting('pollers_unreachable').with(
             setting: 'StartPollersUnreachable',
-            value: '25',
+            value: '1',
           )
         end
         it do
           is_expected.to contain_ini_setting('trappers').with(
             setting: 'StartTrappers',
-            value: '25',
+            value: '5',
           )
         end
         it do
@@ -128,9 +128,6 @@ describe 'zabbix_server' do
             setting: 'Timeout',
             value: '3',
           )
-        end
-        it do
-          is_expected.to contain_sysctl('kernel.shmmax').with_value('268435456')
         end
         it do
           is_expected.to contain_service('zabbix-server').with(
@@ -153,7 +150,7 @@ describe 'zabbix_server' do
           )
         end
         it do
-          is_expected.to contain_file('/usr/local/bin/zabbix_reset.py').with(
+          is_expected.to contain_file('/usr/local/bin/zabbix_api_setup.py').with(
             ensure: 'file',
             mode: '0550',
           ).with_content(
@@ -227,12 +224,12 @@ describe 'zabbix_server' do
             ssl_key: '/etc/ssl/private/wildcard.dns.icann.org.key',
             ssl_chain: '/etc/ssl/certs/DigiCertCA.crt',
             ssl_protocol: '-all +TLSv1.2',
-            ssl_cipher: 'HIGH:!aNULL:!MD5',
+            ssl_cipher: 'EECDH+AESGCM:EDH+AESGCM',
           )
         end
         it do
-          is_expected.to contain_exec('/usr/local/bin/zabbix_reset.py').with(
-            command: '/usr/local/bin/zabbix_reset.py && touch /etc/zabbix/api_created',
+          is_expected.to contain_exec('/usr/local/bin/zabbix_api_setup.py').with(
+            command: '/usr/local/bin/zabbix_api_setup.py && touch /etc/zabbix/api_created',
             creates: '/etc/zabbix/api_created',
           )
         end
@@ -354,7 +351,7 @@ describe 'zabbix_server' do
           end
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_reset.py',
+              '/usr/local/bin/zabbix_api_setup.py',
             ).with_content(
               %r{ZABBIX_HOST\s+=\s+'http://foo.bar'},
             )
@@ -477,7 +474,7 @@ describe 'zabbix_server' do
           end
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_reset.py',
+              '/usr/local/bin/zabbix_api_setup.py',
             ).with_content(
               %r{API_USER\s+=\s+'foobar'},
             )
@@ -495,7 +492,7 @@ describe 'zabbix_server' do
           end
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_reset.py',
+              '/usr/local/bin/zabbix_api_setup.py',
             ).with_content(
               %r{API_PASSWORD\s+=\s+'foobar'},
             )
@@ -506,7 +503,7 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_reset.py',
+              '/usr/local/bin/zabbix_api_setup.py',
             ).with_content(
               %r{NEW_PASSWORD\s+=\s+'foobar'},
             )

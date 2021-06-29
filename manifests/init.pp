@@ -26,7 +26,6 @@ class zabbix_server (
   String               $admin_password           = 'zabbix',
   Integer              $default_group_ids        = 2,
   Integer              $default_template_ids     = 10001,
-  Integer              $kernel_shmmax            = 268435456,
 ) {
 
   ensure_packages([
@@ -34,7 +33,7 @@ class zabbix_server (
     'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
   ])
   python::pip {'pyzabbix':
-    ensure   => '0.7.4',
+    ensure   => '0.8.2',
   }
   mysql::db{ $db_name :
     user           => $db_user,
@@ -103,9 +102,6 @@ class zabbix_server (
       setting => 'Timeout',
       value   => $timeout;
   }
-  sysctl {'kernel.shmmax':
-    value => $kernel_shmmax,
-  }
   service {'zabbix-server':
     ensure  => running,
     enable  => true,
@@ -117,10 +113,10 @@ class zabbix_server (
       ensure  => file,
       mode    => '0500',
       content => template('zabbix_server/zabbix_host.py.erb');
-    '/usr/local/bin/zabbix_reset.py':
+    '/usr/local/bin/zabbix_api_setup.py':
       ensure  => file,
       mode    => '0550',
-      content => template('zabbix_server/reset_passwords.py.erb');
+      content => template('zabbix_server/zabbix_api_setup.py.erb');
     '/etc/zabbix/apache.conf':
       ensure  => file,
       content => template('zabbix_server/apache.conf.erb'),
@@ -159,11 +155,11 @@ class zabbix_server (
       ssl_stapling         => true,
       ssl_honorcipherorder => 'on',
   }
-  exec {'/usr/local/bin/zabbix_reset.py':
-    command => '/usr/local/bin/zabbix_reset.py && touch /etc/zabbix/api_created',
+  exec {'/usr/local/bin/zabbix_api_setup.py':
+    command => '/usr/local/bin/zabbix_api_setup.py && touch /etc/zabbix/api_created',
     creates => '/etc/zabbix/api_created',
     require => [
-      File['/usr/local/bin/zabbix_reset.py'],
+      File['/usr/local/bin/zabbix_api_setup.py'],
       Apache::Vhost["${zabbix_host} non-ssl"],
       Service['apache2'],
     ],
