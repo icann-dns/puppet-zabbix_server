@@ -2,12 +2,13 @@
 // Zabbix GUI configuration file
 global $DB;
 
-$DB['TYPE']     = 'MYSQL';
-$DB['SERVER']   = '<%= @db_host %>';
-$DB['PORT']     = '<%= @db_port %>';
-$DB['DATABASE'] = '<%= @db_name %>';
-$DB['USER']     = '<%= @db_user %>';
-$DB['PASSWORD'] = '<%= @db_password %>';
+$DB['TYPE']           = 'MYSQL';
+$DB['SERVER']         = '<%= @db_host %>';
+$DB['PORT']           = '<%= @db_port %>';
+$DB['DATABASE']       = '<%= @db_name %>';
+$DB['USER']           = '<%= @db_user %>';
+$DB['PASSWORD']       = '<%= @db_password %>';
+$DB['DOUBLE_IEEE754'] = 'true'; 
 
 // SCHEMA is relevant only for IBM_DB2 database
 $DB['SCHEMA'] = '';
