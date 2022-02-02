@@ -154,6 +154,7 @@ class zabbix_server (
       ssl_cipher           => 'EECDH+AESGCM:EDH+AESGCM',
       ssl_stapling         => true,
       ssl_honorcipherorder => 'on',
+      ssl_openssl_conf_cmd => 'DHParameters "/etc/ssl/certs/dhparam.pem"',
   }
   exec {'/usr/local/bin/zabbix_api_setup.py':
     command => '/usr/local/bin/zabbix_api_setup.py && touch /etc/zabbix/api_created',
