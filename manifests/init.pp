@@ -164,5 +164,5 @@ class zabbix_server (
       Apache::Vhost["${zabbix_host} non-ssl"],
       Service['apache2'],
     ],
-  } -> Zabbix_host <<||>>
+  } -> Z_host <<||>>
 }

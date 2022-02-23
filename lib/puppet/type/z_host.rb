@@ -1,5 +1,5 @@
 require 'English'
-Puppet::Type.newtype(:zabbix_host) do
+Puppet::Type.newtype(:z_host) do
   @doc = 'This type provides the capability to manage hosts in zabbix'
 
   ensurable

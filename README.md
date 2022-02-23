@@ -47,22 +47,21 @@ package {'zabbix':
 
 ### Beginning with zabbix\_server
 
-You should be able to just `include zabbix` to get a basic server up and running.  you can add hosts and sites using the `zabbix_site` and `zabbix_host` types.
+You should be able to just `include zabbix_server` to get a basic server up and running. You can add hosts using the`z_host` type.
 
 ## Usage
 
-A simple example would be to have all nodes allooceted to one zabbix group and template.  Unfortunatly we need to use the template id number and not the description, also this module tose not manage the group and template creation
-
+A simple example would be to have all nodes allooceted to one zabbix group and template. Unfortunatly we need to use the template id number and not the description, also this module tose not manage the group and template creation
 
 zabbix.example.com manifest
 ```puppet
 node 'zabbix.example.com' {
   include zabbix
-  Zabbix_host <<||>>
+  Z_host <<||>>
 }
 
 node /\.servers\.example\.com$/ {
-  @@zabbix_host {$::trusted['certname']:
+  @@z_host {$::trusted['certname']:
     ensure      => present,
     operational => true,
     groupids    => ['1',]
