@@ -2,7 +2,7 @@ require 'json'
 
 # check out the following blog serious for info on greating type/providers
 # http://garylarizza.com/blog/2013/12/15/seriously-what-is-this-provider-doing/
-Puppet::Type.type(:zabbix_host).provide(:zabbix) do
+Puppet::Type.type(:z_host).provide(:zabbix) do
   commands zabbix_host: '/usr/local/bin/zabbix_host.py'
   defaultfor kernel: 'Linux'
   # create getters and setters
