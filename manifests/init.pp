@@ -30,7 +30,7 @@ class zabbix_server (
 ) {
 
   ensure_packages([
-    'zabbix-server-mysql', 'zabbix-frontend-php', 'snmp-mibs-downloader',
+    'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts', 'snmp-mibs-downloader',
     'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
   ])
   python::pip {'pyzabbix':
