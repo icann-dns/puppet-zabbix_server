@@ -14,7 +14,8 @@ class zabbix_server (
   String               $trend_cache_size         = '4M',
   String               $value_cache_size         = '8M',
   Stdlib::Absolutepath $log_file                 = '/var/log/zabbix/zabbix_server.log',
-  Stdlib::Absolutepath $mysql_schema             = '/usr/share/doc/zabbix-sql-scripts/mysql/create.sql.gz',
+  Stdlib::Absolutepath $mysql_schema             = '/usr/share/doc/zabbix-sql-scripts/mysql/create.sql',
+  String               $import_cat_cmd           = 'cat',
   Integer[1,1000]      $pollers                  = 5,
   Integer[1,1000]      $pingers                  = 1,
   Integer[1,1000]      $pollers_unreachable      = 1,
@@ -45,7 +46,7 @@ class zabbix_server (
     grant          => ['all'],
     sql            => $mysql_schema,
     require        => Package['zabbix-server-mysql'],
-    import_cat_cmd => 'zcat',
+    import_cat_cmd => $import_cat_cmd,
   }
   Ini_setting {
     path    => '/etc/zabbix/zabbix_server.conf',
