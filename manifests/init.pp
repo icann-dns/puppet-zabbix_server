@@ -30,13 +30,17 @@ class zabbix_server (
   String               $admin_password           = 'zabbix',
   Integer              $default_group_ids        = 2,
   Integer              $default_template_ids     = 10001,
+  Stdlib::Unixpath     $icann_nodes_repo         = '/etc/hieradata',
 ) {
   ensure_packages([
       'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts',
       'snmp-mibs-downloader', 'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
+      'python3-pip', 'python3-yaml',
   ])
   python::pip { 'pyzabbix':
-    ensure   => '0.8.2',
+    ensure       => '0.8.2',
+    pip_provider => 'pip3',
+    require      => Package['python3-pip'],
   }
   mysql::db { $db_name :
     user           => $db_user,
@@ -113,23 +117,35 @@ class zabbix_server (
   ensure_resource('file', '/srv/www', { 'ensure' => 'directory' })
   file {
     default:
-      ensure  => file,
-      mode    => '0500';
+      ensure => file,
+      mode   => '0500';
     '/usr/local/bin/zabbix_host.py':
       content => template('zabbix_server/zabbix_host.py.erb');
     '/usr/local/bin/zabbix_api_setup.py':
       content => template('zabbix_server/zabbix_api_setup.py.erb');
+    '/usr/local/sbin/zabbix-maintenance':
+      source => 'puppet:///modules/zabbix_server/zabbix_maintenance.py';
+  }
+  # TODO: should this be https
+  $config = {
+    'server'    => "http://${zabbix_host}",
+    'usersname' => $api_user,
+    'password'  => $api_password,
+    'repo'      => "${icann_nodes_repo}/nodes",
   }
   file {
     default:
       ensure  => file,
-      mode    => '0755',
+      mode    => '0444',
       require => Package['zabbix-frontend-php'];
     '/etc/zabbix/apache.conf':
       content => template('zabbix_server/apache.conf.erb'),
       notify => Service['apache2'];
     '/etc/zabbix/web/zabbix.conf.php':
       content => template('zabbix_server/zabbix.conf.php.erb');
+    '/etc/zabbix/api.yaml':
+      mode    => '0400',
+      content => $config.to_yaml,
   }
   file { '/etc/ldap/ldap.conf':
     ensure => file,
