@@ -31,7 +31,6 @@ Puppet::Type.type(:z_host).provide(:zabbix) do
       # Puppet.debug("collecting #{host['host']}")
       result = { ensure: :present }
       result[:name] = host['host']
-      result[:operational] = (host['status'] == '0') ? 'true' : 'false'
       result[:templateids] = []
       result[:groupids] = []
       host['parentTemplates'].each do |template|
@@ -48,10 +47,6 @@ Puppet::Type.type(:z_host).provide(:zabbix) do
     @property_flush[:groupids] = value
   end
 
-  def operational=(value)
-    @property_flush[:operational] = value
-  end
-
   def templateids=(value)
     @property_flush[:templateids] = value
   end
@@ -59,12 +54,10 @@ Puppet::Type.type(:z_host).provide(:zabbix) do
   def flush
     @groupids =  @property_flush.key?(:groupids) ? @property_flush[:groupids] : @resource[:groupids]
     @templateids =  @property_flush.key?(:templateids) ? @property_flush[:templateids] : @resource[:templateids]
-    @operational =  @property_flush.key?(:operational) ? @property_flush[:operational] : @resource[:operational]
     if @property_flush[:ensure] == :absent
       zabbix_host('--delete', '--node', @resource[:name])
     else
-      zabbix_host('-t', @templateids.join(','), '-g', @groupids.join(','),
-                  '--operational', @operational, '--node', @resource[:name])
+      zabbix_host('-t', @templateids.join(','), '-g', @groupids.join(','), '--node', @resource[:name])
     end
   end
 

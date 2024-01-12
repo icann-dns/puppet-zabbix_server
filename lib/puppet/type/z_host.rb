@@ -20,15 +20,6 @@ Puppet::Type.newtype(:z_host) do
     newvalues(%r{[\w\-\.]+})
   end
 
-  newproperty(:operational, boolean: true) do
-    desc 'whether to monitor the host'
-    newvalue(:true)
-    newvalue(:false)
-    munge do |value|
-      @resource.munge_boolean(value)
-    end
-  end
-
   newproperty(:groupids, array_matching: :all) do
     desc 'groups ids this host is a member of'
     newvalues(%r{\d+})
@@ -42,6 +33,16 @@ Puppet::Type.newtype(:z_host) do
     newvalues(%r{\d+})
     def insync?(is)
       is.sort == should.sort
+    end
+  end
+
+  # TODO: This property is now a no op and will be removed in future release
+  newproperty(:operational, boolean: true) do
+    desc 'whether to monitor the host'
+    newvalue(:true)
+    newvalue(:false)
+    munge do |value|
+      @resource.munge_boolean(value)
     end
   end
 
