@@ -6,7 +6,9 @@ fixtures:
      stdlib: "puppetlabs/stdlib"
      apache: "puppetlabs/apache"
      inifile: "puppetlabs/inifile"
-     mysql: "puppetlabs/mysql"
+     mysql:
+       repo: "puppetlabs/mysql"
+       ref: '12.0.1'
      concat: "puppetlabs/concat"
      sysctl: "thias/sysctl"
-     python: "stankevich/python"
+     python: "puppet/python"

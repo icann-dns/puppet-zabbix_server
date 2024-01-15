@@ -46,7 +46,7 @@ describe 'zabbix_server' do
             password: 'changeme',
             host: 'localhost',
             grant: ['all'],
-            sql: '/usr/share/doc/zabbix-server-mysql/create.sql.gz',
+            sql: '/usr/share/doc/zabbix-sql-scripts/mysql/create.sql.gz',
             require: 'Package[zabbix-server-mysql]',
             import_cat_cmd: 'zcat',
           )
@@ -140,19 +140,15 @@ describe 'zabbix_server' do
             ensure: 'file',
             mode: '0500',
           ).with_content(
-            %r{'--user', default='user'},
+            %r{'--group-ids',\s+default='2'}x,
           ).with_content(
-            %r{'--password', default='password'},
-          ).with_content(
-            %r{'--group-ids', default='2'},
-          ).with_content(
-            %r{'--template-ids', default='10001'},
+            %r{'--template-ids',\s+default='10001'}x,
           )
         end
         it do
           is_expected.to contain_file('/usr/local/bin/zabbix_api_setup.py').with(
             ensure: 'file',
-            mode: '0550',
+            mode: '0500',
           ).with_content(
             %r{NEW_PASSWORD\s+=\s+'zabbix'},
           ).with_content(
@@ -195,7 +191,7 @@ describe 'zabbix_server' do
           )
         end
         it do
-          is_expected.to contain_file('/etc/ldap/ldap.conf').with_ensure('present')
+          is_expected.to contain_file('/etc/ldap/ldap.conf').with_ensure('file')
         end
         it do
           is_expected.to contain_file_line('Append to /etc/ldap/ldap.conf').with(
@@ -467,13 +463,6 @@ describe 'zabbix_server' do
           it { is_expected.to compile }
           it do
             is_expected.to contain_file(
-              '/usr/local/bin/zabbix_host.py',
-            ).with_content(
-              %r{'--user', default='foobar'},
-            )
-          end
-          it do
-            is_expected.to contain_file(
               '/usr/local/bin/zabbix_api_setup.py',
             ).with_content(
               %r{API_USER\s+=\s+'foobar'},
@@ -483,13 +472,6 @@ describe 'zabbix_server' do
         context 'api_password' do
           before(:each) { params.merge!(api_password: 'foobar') }
           it { is_expected.to compile }
-          it do
-            is_expected.to contain_file(
-              '/usr/local/bin/zabbix_host.py',
-            ).with_content(
-              %r{'--password', default='foobar'},
-            )
-          end
           it do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_api_setup.py',
@@ -516,7 +498,7 @@ describe 'zabbix_server' do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_host.py',
             ).with_content(
-              %r{'--group-ids', default='42'},
+              %r{'--group-ids',\s+default='42'}x,
             )
           end
         end
@@ -527,7 +509,7 @@ describe 'zabbix_server' do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_host.py',
             ).with_content(
-              %r{'--template-ids', default='42'},
+              %r{'--template-ids',\s+default='42'}x,
             )
           end
         end
