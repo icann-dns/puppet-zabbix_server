@@ -7,7 +7,7 @@ class zabbix_server (
   String               $db_user                  = 'zabbix',
   String               $db_password              = 'changeme',
   String               $php_timezone             = 'UTC',
-  Stdlib::Host         $zabbix_host              = $::fqdn,
+  Stdlib::Host         $zabbix_host              = $facts['networking']['fqdn'],
   Stdlib::Port         $zabbix_port              = 10051,
   String               $cache_size               = '8M',
   String               $history_index_cache_size = '4M',
@@ -30,16 +30,19 @@ class zabbix_server (
   String               $admin_password           = 'zabbix',
   Integer              $default_group_ids        = 2,
   Integer              $default_template_ids     = 10001,
+  Stdlib::Unixpath     $icann_nodes_repo         = '/etc/hieradata',
 ) {
-
   ensure_packages([
-    'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts', 'snmp-mibs-downloader',
-    'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
+      'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts',
+      'snmp-mibs-downloader', 'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
+      'python3-pip', 'python3-yaml',
   ])
-  python::pip {'pyzabbix':
-    ensure   => '0.8.2',
+  python::pip { 'pyzabbix':
+    ensure       => '0.8.2',
+    pip_provider => 'pip3',
+    require      => Package['python3-pip'],
   }
-  mysql::db{ $db_name :
+  mysql::db { $db_name :
     user           => $db_user,
     password       => $db_password,
     host           => $db_host,
@@ -106,50 +109,62 @@ class zabbix_server (
       setting => 'Timeout',
       value   => $timeout;
   }
-  service {'zabbix-server':
+  service { 'zabbix-server':
     ensure  => running,
     enable  => true,
     require => Mysql::Db[$db_name],
   }
   ensure_resource('file', '/srv/www', { 'ensure' => 'directory' })
   file {
+    default:
+      ensure => file,
+      mode   => '0500';
     '/usr/local/bin/zabbix_host.py':
-      ensure  => file,
-      mode    => '0500',
       content => template('zabbix_server/zabbix_host.py.erb');
     '/usr/local/bin/zabbix_api_setup.py':
-      ensure  => file,
-      mode    => '0550',
       content => template('zabbix_server/zabbix_api_setup.py.erb');
-    '/etc/zabbix/apache.conf':
-      ensure  => file,
-      content => template('zabbix_server/apache.conf.erb'),
-      require => Package['zabbix-frontend-php'],
-      notify  => Service['apache2'];
-    '/etc/zabbix/web/zabbix.conf.php':
-      ensure  => file,
-      content => template('zabbix_server/zabbix.conf.php.erb'),
-      require => Package['zabbix-frontend-php'];
+    '/usr/local/sbin/zabbix-maintenance':
+      source => 'puppet:///modules/zabbix_server/zabbix_maintenance.py';
   }
-  file {'/etc/ldap/ldap.conf':
-      ensure => present,
-  }-> file_line {
-    'Append to /etc/ldap/ldap.conf':
-      path => '/etc/ldap/ldap.conf',
-      line => 'TLS_REQCERT never',
+  # TODO: should this be https
+  $config = {
+    'server'    => "http://${zabbix_host}",
+    'usersname' => $api_user,
+    'password'  => $api_password,
+    'repo'      => "${icann_nodes_repo}/nodes",
+  }
+  file {
+    default:
+      ensure  => file,
+      mode    => '0444',
+      require => Package['zabbix-frontend-php'];
+    '/etc/zabbix/apache.conf':
+      content => template('zabbix_server/apache.conf.erb'),
+      notify => Service['apache2'];
+    '/etc/zabbix/web/zabbix.conf.php':
+      content => template('zabbix_server/zabbix.conf.php.erb');
+    '/etc/zabbix/api.yaml':
+      mode    => '0400',
+      content => $config.to_yaml,
+  }
+  file { '/etc/ldap/ldap.conf':
+    ensure => file,
+  }
+  file_line { 'Append to /etc/ldap/ldap.conf':
+    path    => '/etc/ldap/ldap.conf',
+    line    => 'TLS_REQCERT never',
+    require => File['/etc/ldap/ldap.conf'],
   }
   include apache
   apache::vhost {
-    "${zabbix_host} non-ssl":
+    default:
       servername          => $zabbix_host,
       docroot             => "${approot}/",
-      port                => 80,
       additional_includes => ['/etc/zabbix/apache.conf',];
+    "${zabbix_host} non-ssl":
+      port => 80;
     $zabbix_host:
-      servername           => $zabbix_host,
-      docroot              => "${approot}/",
       port                 => 443,
-      additional_includes  => ['/etc/zabbix/apache.conf',],
       ssl                  => true,
       ssl_cert             => '/etc/ssl/certs/wildcard.dns.icann.org.crt',
       ssl_key              => '/etc/ssl/private/wildcard.dns.icann.org.key',
@@ -158,9 +173,9 @@ class zabbix_server (
       ssl_cipher           => 'EECDH+AESGCM:EDH+AESGCM',
       ssl_stapling         => true,
       ssl_honorcipherorder => 'on',
-      ssl_openssl_conf_cmd => 'DHParameters "/etc/ssl/certs/dhparam.pem"',
+      ssl_openssl_conf_cmd => 'DHParameters "/etc/ssl/certs/dhparam.pem"';
   }
-  exec {'/usr/local/bin/zabbix_api_setup.py':
+  exec { '/usr/local/bin/zabbix_api_setup.py':
     command => '/usr/local/bin/zabbix_api_setup.py && touch /etc/zabbix/api_created',
     creates => '/etc/zabbix/api_created',
     require => [

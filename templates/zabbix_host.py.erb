@@ -1,9 +1,13 @@
-#!/usr/bin/env python2
-import pyzabbix
-import socket
+#!/usr/bin/env python3
 import argparse
-import sys
 import json
+import socket
+import sys
+
+from pathlib import Path
+
+import pyzabbix
+import yaml
 # Uncomment for debugging
 #import logging
 #logger = logging.getLogger("pyzabbix")
@@ -14,12 +18,10 @@ import json
 
 def get_args():
     parser = argparse.ArgumentParser(description='add a host to zabbix')
-    parser.add_argument('-s', '--server', default='http://<%= @zabbix_host %>', help='Zabbix API server to use')
-    parser.add_argument('-u', '--user', default='<%= @api_user %>', help='Zabbix API username')
-    parser.add_argument('-p', '--password', default='<%= @api_password %>', help='Zabbix API password')
+
+    parser.add_argument('-c', '--config-file', default='/etc/zabbix/api.yaml', help='path to api config', type=Path)
     parser.add_argument('-g', '--group-ids', default='<%= @default_group_ids %>', help='Group IDs for host')
     parser.add_argument('-t', '--template-ids', default='<%= @default_template_ids %>', help='Template IDs for host')
-    parser.add_argument('--operational', help='set the host as operational', choices=['true', 'false'])
     parser.add_argument('--exists', help='check if the host exists', action='store_true')
     parser.add_argument('--update', help='update host setting', action='store_true')
     parser.add_argument('--delete', help='delete the host', action='store_true')
@@ -33,7 +35,7 @@ def get_interfaces(node):
     snmp_details = {
         'version': 2,
         'community': '{$SNMP_COMMUNITY}'
-    } 
+    }
     for addr_info in socket.getaddrinfo(node, 80, 0, 0, socket.SOL_TCP):
         if "drac" in node:
             interface = {
@@ -62,21 +64,21 @@ def get_interfaces(node):
 def main():
 
     args = get_args()
-    zapi = pyzabbix.ZabbixAPI(args.server)
+    config = yaml.safe_load(args.config_file.read_text())
+    zapi = pyzabbix.ZabbixAPI(config['server'])
 
     # Login to the Zabbix API
-    zapi.login(args.user, args.password)
+    zapi.login(config['username'], config['password'])
     # current_config = zapi.host.get(filter = { 'host' : args.node })
     if args.node:
         current_config = zapi.host.get(
                 filter={'host': args.node},
-                output=['hostid', 'status', 'host'],
+                output=['hostid', 'host'],
                 selectGroups='shorten', selectParentTemplates='shorten')
     else:
-        current_config = zapi.host.get(output=['hostid', 'status', 'host'],
+        current_config = zapi.host.get(output=['hostid', 'host'],
               selectGroups='shorten', selectParentTemplates='shorten')
 
-    status = 0 if args.operational == 'true' else 1
     groups = []
     templates = []
     for group_id in args.group_ids.split(','):
@@ -87,9 +89,9 @@ def main():
     if args.exists:
         if current_config:
             # There should only be one element in the array
-            print json.dumps(current_config)
+            print(json.dumps(current_config))
         else:
-            print '{}'
+            print('{}')
         sys.exit()
     if current_config:
         for host in current_config:
@@ -98,7 +100,6 @@ def main():
             else:
                 result = zapi.host.update(
                         hostid=host['hostid'],
-                        status=status,
                         groups=groups,
                         templates=templates,)
     else:
@@ -106,7 +107,6 @@ def main():
             interfaces = get_interfaces(args.node)
             result = zapi.host.create( # noqa
                     host=args.node,
-                    status=status,
                     interfaces=interfaces,
                     groups=groups,
                     templates=templates,)
