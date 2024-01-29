@@ -4,17 +4,6 @@ Puppet::Type.newtype(:z_host) do
 
   ensurable
 
-  def munge_boolean(value)
-    case value
-    when true, 'true', :true
-      :true
-    when false, 'false', :false
-      :false
-    else
-      raise ArgumentError('munge_boolean only takes booleans')
-    end
-  end
-
   newparam(:host, namevar: true) do
     desc 'the FQFN'
     newvalues(%r{[\w\-\.]+})
@@ -37,12 +26,13 @@ Puppet::Type.newtype(:z_host) do
   end
 
   # TODO: This property is now a no op and will be removed in future release
+  # We also munge everything to true
   newproperty(:operational, boolean: true) do
     desc 'whether to monitor the host'
     newvalue(:true)
     newvalue(:false)
     munge do |value|
-      @resource.munge_boolean(value)
+      :true
     end
   end
 
