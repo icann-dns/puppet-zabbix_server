@@ -31,6 +31,7 @@ Puppet::Type.type(:z_host).provide(:zabbix) do
       # Puppet.debug("collecting #{host['host']}")
       result = { ensure: :present }
       result[:name] = host['host']
+      result[:operational] = 'true'
       result[:templateids] = []
       result[:groupids] = []
       host['parentTemplates'].each do |template|

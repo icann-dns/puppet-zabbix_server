@@ -100,6 +100,7 @@ def main():
             else:
                 result = zapi.host.update(
                         hostid=host['hostid'],
+                        status=0,
                         groups=groups,
                         templates=templates,)
     else:
@@ -107,6 +108,7 @@ def main():
             interfaces = get_interfaces(args.node)
             result = zapi.host.create( # noqa
                     host=args.node,
+                    status=0,
                     interfaces=interfaces,
                     groups=groups,
                     templates=templates,)

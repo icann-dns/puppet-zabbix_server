@@ -35,12 +35,11 @@ class zabbix_server (
   ensure_packages([
       'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts',
       'snmp-mibs-downloader', 'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
-      'python3-pip', 'python3-yaml',
+      'python3-yaml',
   ])
   python::pip { 'pyzabbix':
     ensure       => '0.8.2',
     pip_provider => 'pip3',
-    require      => Package['python3-pip'],
   }
   mysql::db { $db_name :
     user           => $db_user,
@@ -128,10 +127,10 @@ class zabbix_server (
   }
   # TODO: should this be https
   $config = {
-    'server'    => "http://${zabbix_host}",
-    'usersname' => $api_user,
-    'password'  => $api_password,
-    'repo'      => "${icann_nodes_repo}/nodes",
+    'server'   => "http://${zabbix_host}",
+    'username' => $api_user,
+    'password' => $api_password,
+    'repo'     => "${icann_nodes_repo}/nodes",
   }
   file {
     default:
