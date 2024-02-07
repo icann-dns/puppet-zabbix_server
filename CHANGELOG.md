@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2024-02-07 v0.3.2
+* update boot strap script to python3
+* update maintance script to work with 0 down hosts
+
 ## 2024-01-29 v0.3.1
 * Don't install python3-pip leave that to the python module
 
