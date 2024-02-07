@@ -161,13 +161,15 @@ class ZabbixMaint:
 
         active_since = int(time())
         active_till = active_since + self._time_period
-        self._zabbix_maint = self._zapi.maintenance.create(
-            name=self.maintenance_name,
-            hostids=self.filter_hostids(False),
-            active_since=active_since,
-            active_till=active_till,
-            timeperiods=self.timeperiods,
-        )
+        hostids = self.filter_hostids(False)
+        if len(hostids) > 0:
+            self._zabbix_maint = self._zapi.maintenance.create(
+                name=self.maintenance_name,
+                hostids=hostids,
+                active_since=active_since,
+                active_till=active_till,
+                timeperiods=self.timeperiods,
+            )
 
     @property
     def maintenanceid(self):
@@ -175,7 +177,10 @@ class ZabbixMaint:
         try:
             return self.zabbix_maint['maintenanceid']
         except KeyError:
-            return self.zabbix_maint['maintenanceids'][0]
+            try:
+                return self.zabbix_maint['maintenanceids'][0]
+            except KeyError:
+                return None
 
     def filter_nodes(self, search: bool = False) -> List[str]:
         """Filter the list of yaml hosts filtering on operational state.
@@ -223,11 +228,12 @@ class ZabbixMaint:
     def update_maintenance(self) -> None:
         """Update the list of hosts for the maintenance."""
         active_till = int(time()) + self._time_period
-        self._zapi.maintenance.update(
-            maintenanceid=self.maintenanceid,
-            active_till=active_till,
-            hostids=self.filter_hostids(False),
-        )
+        if self.maintenanceid is not None:
+            self._zapi.maintenance.update(
+                maintenanceid=self.maintenanceid,
+                active_till=active_till,
+                hostids=self.filter_hostids(False),
+            )
 
 
 def get_args(args: Optional[list] = None) -> Namespace:
