@@ -254,8 +254,17 @@ class TestZabbixMaint:
         ):
             self.zabbix_maintenance.load_zabbix_maint()
 
-    def test_load_zabbix_maint_create_new(self):
+    @pytest.mark.parametrize(
+        'hostids, maintenanceid',
+        (
+            (["1"], "1"),
+            ([], None),
+        )
+    )
+    @mock.patch('zabbix_maintenance.ZabbixMaint.filter_hostids')
+    def test_load_zabbix_maint_create_new(self, mock_filter_hostids, hostids, maintenanceid):
         """Test the load_zabbix_maint method."""
+        mock_filter_hostids.return_value = hostids
 
         def response_callback(request, _context):
             if 'maintenance.create' in request.text:
@@ -264,7 +273,7 @@ class TestZabbixMaint:
 
         self.requests_mock.post('/api_jsonrpc.php', json=response_callback)
         self.zabbix_maintenance.load_zabbix_maint()
-        assert self.zabbix_maintenance.maintenanceid == '1'
+        assert self.zabbix_maintenance.maintenanceid == maintenanceid
 
     @mock.patch('zabbix_maintenance.ZabbixMaint.filter_hostids', return_value=['1'])
     def test_update_maintenance(self, mock_filter_hostids):
