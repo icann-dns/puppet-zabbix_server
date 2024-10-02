@@ -15,8 +15,8 @@ class zabbix_server (
   String               $value_cache_size         = '8M',
   Stdlib::Absolutepath $log_file                 = '/var/log/zabbix/zabbix_server.log',
   Stdlib::Absolutepath $mysql_schema             = '/usr/share/doc/zabbix-sql-scripts/mysql/create.sql.gz',
-  String               $charset                  = 'utf8',
-  String               $collate                  = 'utf8_bin',
+  String               $charset                  = 'utf8mb4',
+  String               $collate                  = 'utf8mb4_bin',
   String               $import_cat_cmd           = 'zcat',
   Integer[1,1000]      $pollers                  = 5,
   Integer[1,1000]      $pingers                  = 1,
@@ -38,7 +38,7 @@ class zabbix_server (
       'python3-yaml',
   ])
   python::pip { 'pyzabbix':
-    ensure       => '0.8.2',
+    ensure       => '1.3.1',
     pip_provider => 'pip3',
   }
   mysql::db { $db_name :

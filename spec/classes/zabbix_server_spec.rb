@@ -39,7 +39,7 @@ describe 'zabbix_server' do
 
       describe 'check default config' do
         it { is_expected.to compile.with_all_deps }
-        it { is_expected.to contain_python__pip('pyzabbix').with_ensure('0.8.2') }
+        it { is_expected.to contain_python__pip('pyzabbix').with_ensure('1.3.1') }
         it do
           is_expected.to contain_mysql__db('zabbix').with(
             user: 'zabbix',
