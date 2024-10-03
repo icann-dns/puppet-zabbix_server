@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2024-10-03 v0.4.0
+* Update pyzabbix version
+* change chartype
+
 ## 2024-02-07 v0.3.2
 * update boot strap script to python3
 * update maintance script to work with 0 down hosts
