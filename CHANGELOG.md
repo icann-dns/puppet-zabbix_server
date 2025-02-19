@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2024-10-03 v0.4.1
+* update mysql::db sql param to use array not string
+
 ## 2024-10-03 v0.4.0
 * Update pyzabbix version
 * change chartype
