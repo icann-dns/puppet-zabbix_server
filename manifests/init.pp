@@ -48,7 +48,7 @@ class zabbix_server (
     charset        => $charset,
     collate        => $collate,
     grant          => ['all'],
-    sql            => $mysql_schema,
+    sql            => [$mysql_schema],
     require        => Package['zabbix-server-mysql'],
     import_cat_cmd => $import_cat_cmd,
   }
