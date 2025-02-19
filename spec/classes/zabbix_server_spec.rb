@@ -46,7 +46,7 @@ describe 'zabbix_server' do
             password: 'changeme',
             host: 'localhost',
             grant: ['all'],
-            sql: '/usr/share/doc/zabbix-sql-scripts/mysql/create.sql.gz',
+            sql: ['/usr/share/doc/zabbix-sql-scripts/mysql/create.sql.gz'],
             require: 'Package[zabbix-server-mysql]',
             import_cat_cmd: 'zcat',
           )
