@@ -1,6 +1,39 @@
-# == Class: zabbix_server
-#
+# @summary Installs and configures a Zabbix server with MySQL and Apache.
+# @param ssl_cert Absolute path to the TLS certificate file used by the Apache vhost.
+# @param ssl_key Absolute path to the TLS private key file used by the Apache vhost.
+# @param db_host Database host used by the Zabbix server backend.
+# @param db_port Database port used by the Zabbix server backend.
+# @param db_name Name of the MySQL database created for Zabbix.
+# @param db_user Database username granted access to the Zabbix database.
+# @param db_password Database password for `db_user`.
+# @param php_timezone PHP timezone value written to the frontend configuration.
+# @param zabbix_host Hostname used for Apache virtual hosts and Zabbix API access.
+# @param zabbix_port Port where the Zabbix server listens for trapper and agent data.
+# @param cache_size Value for the `CacheSize` setting in `zabbix_server.conf`.
+# @param history_index_cache_size Value for the `HistoryIndexCacheSize` setting.
+# @param trend_cache_size Value for the `TrendCacheSize` setting.
+# @param value_cache_size Value for the `ValueCacheSize` setting.
+# @param log_file Absolute path to the Zabbix server log file.
+# @param mysql_schema Path to the initial Zabbix MySQL schema archive imported at setup time.
+# @param charset MySQL character set used when creating the Zabbix database.
+# @param collate MySQL collation used when creating the Zabbix database.
+# @param import_cat_cmd Command used by `mysql::db` to read compressed schema files.
+# @param pollers Number of poller processes (`StartPollers`).
+# @param pingers Number of ICMP pinger processes (`StartPingers`).
+# @param pollers_unreachable Number of unreachable poller processes (`StartPollersUnreachable`).
+# @param proxy_pollers Number of proxy poller processes (`StartProxyPollers`).
+# @param trappers Number of trapper processes (`StartTrappers`).
+# @param timeout Zabbix server processing timeout in seconds.
+# @param approot Document root base path used by the Apache virtual host.
+# @param api_user Username used by the local API bootstrap script.
+# @param api_password Password used by the local API bootstrap script.
+# @param admin_password Desired Zabbix Admin account password set by the API bootstrap script.
+# @param default_group_ids Default host group ID(s) assigned by the API bootstrap script.
+# @param default_template_ids Default template ID(s) linked by the API bootstrap script.
+# @param icann_nodes_repo Base path to node data consumed by the host sync script.
 class zabbix_server (
+  Stdlib::Unixpath     $ssl_cert,
+  Stdlib::Unixpath     $ssl_key,
   Stdlib::Host         $db_host                  = 'localhost',
   Stdlib::Port         $db_port                  = 3306,
   String               $db_name                  = 'zabbix',
@@ -165,9 +198,8 @@ class zabbix_server (
     $zabbix_host:
       port                 => 443,
       ssl                  => true,
-      ssl_cert             => '/etc/ssl/certs/wildcard.dns.icann.org.crt',
-      ssl_key              => '/etc/ssl/private/wildcard.dns.icann.org.key',
-      ssl_chain            => '/etc/ssl/certs/DigiCertCA.crt',
+      ssl_cert             => $ssl_cert,
+      ssl_key              => $ssl_key,
       ssl_protocol         => '-all +TLSv1.2',
       ssl_cipher           => 'EECDH+AESGCM:EDH+AESGCM',
       ssl_stapling         => true,
