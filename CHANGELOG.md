@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2026-05-12 v0.5.0
+* make ssl_cert and ssl_key mandatory parameters
+
 ## 2024-10-03 v0.4.1
 * update mysql::db sql param to use array not string
 
