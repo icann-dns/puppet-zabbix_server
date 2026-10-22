@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2026-05-12 v0.6.0
+* add optional ssl_chain
+* remove php overrides
+
 ## 2026-05-12 v0.5.0
 * make ssl_cert and ssl_key mandatory parameters
 
