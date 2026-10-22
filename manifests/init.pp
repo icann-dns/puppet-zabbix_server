@@ -51,12 +51,12 @@ class zabbix_server (
   String               $charset                  = 'utf8mb4',
   String               $collate                  = 'utf8mb4_bin',
   String               $import_cat_cmd           = 'zcat',
-  Integer[1,1000]      $pollers                  = 5,
-  Integer[1,1000]      $pingers                  = 1,
-  Integer[1,1000]      $pollers_unreachable      = 1,
-  Integer[1,1000]      $proxy_pollers            = 1,
-  Integer[1,1000]      $trappers                 = 5,
-  Integer[1,30]        $timeout                  = 3,
+  Integer[1, 1000]     $pollers                  = 5,
+  Integer[1, 1000]     $pingers                  = 1,
+  Integer[1, 1000]     $pollers_unreachable      = 1,
+  Integer[1, 1000]     $proxy_pollers            = 1,
+  Integer[1, 1000]     $trappers                 = 5,
+  Integer[1, 30]       $timeout                  = 3,
   Stdlib::Absolutepath $approot                  = '/srv/www',
   String               $api_user                 = 'user',
   String               $api_password             = 'password',
@@ -65,10 +65,10 @@ class zabbix_server (
   Integer              $default_template_ids     = 10001,
   Stdlib::Unixpath     $icann_nodes_repo         = '/etc/hieradata',
 ) {
-  ensure_packages([
-      'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts',
-      'snmp-mibs-downloader', 'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
-      'python3-yaml',
+  stdlib::ensure_packages([
+    'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts',
+    'snmp-mibs-downloader', 'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
+    'python3-yaml',
   ])
   python::pip { 'pyzabbix':
     ensure       => '1.3.1',
@@ -192,7 +192,7 @@ class zabbix_server (
     default:
       servername          => $zabbix_host,
       docroot             => "${approot}/",
-      additional_includes => ['/etc/zabbix/apache.conf',];
+      additional_includes => ['/etc/zabbix/apache.conf'];
     "${zabbix_host} non-ssl":
       port => 80;
     $zabbix_host:
