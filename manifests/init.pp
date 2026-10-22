@@ -31,44 +31,46 @@
 # @param default_group_ids Default host group ID(s) assigned by the API bootstrap script.
 # @param default_template_ids Default template ID(s) linked by the API bootstrap script.
 # @param icann_nodes_repo Base path to node data consumed by the host sync script.
+# @param ssl_chain Optional path to the SSL chain file used by the Apache virtual host.
 class zabbix_server (
-  Stdlib::Unixpath     $ssl_cert,
-  Stdlib::Unixpath     $ssl_key,
-  Stdlib::Host         $db_host                  = 'localhost',
-  Stdlib::Port         $db_port                  = 3306,
-  String               $db_name                  = 'zabbix',
-  String               $db_user                  = 'zabbix',
-  String               $db_password              = 'changeme',
-  String               $php_timezone             = 'UTC',
-  Stdlib::Host         $zabbix_host              = $facts['networking']['fqdn'],
-  Stdlib::Port         $zabbix_port              = 10051,
-  String               $cache_size               = '8M',
-  String               $history_index_cache_size = '4M',
-  String               $trend_cache_size         = '4M',
-  String               $value_cache_size         = '8M',
-  Stdlib::Absolutepath $log_file                 = '/var/log/zabbix/zabbix_server.log',
-  Stdlib::Absolutepath $mysql_schema             = '/usr/share/doc/zabbix-sql-scripts/mysql/create.sql.gz',
-  String               $charset                  = 'utf8mb4',
-  String               $collate                  = 'utf8mb4_bin',
-  String               $import_cat_cmd           = 'zcat',
-  Integer[1,1000]      $pollers                  = 5,
-  Integer[1,1000]      $pingers                  = 1,
-  Integer[1,1000]      $pollers_unreachable      = 1,
-  Integer[1,1000]      $proxy_pollers            = 1,
-  Integer[1,1000]      $trappers                 = 5,
-  Integer[1,30]        $timeout                  = 3,
-  Stdlib::Absolutepath $approot                  = '/srv/www',
-  String               $api_user                 = 'user',
-  String               $api_password             = 'password',
-  String               $admin_password           = 'zabbix',
-  Integer              $default_group_ids        = 2,
-  Integer              $default_template_ids     = 10001,
-  Stdlib::Unixpath     $icann_nodes_repo         = '/etc/hieradata',
+  Stdlib::Unixpath           $ssl_cert,
+  Stdlib::Unixpath           $ssl_key,
+  Stdlib::Host               $db_host                  = 'localhost',
+  Stdlib::Port               $db_port                  = 3306,
+  String                     $db_name                  = 'zabbix',
+  String                     $db_user                  = 'zabbix',
+  String                     $db_password              = 'changeme',
+  String                     $php_timezone             = 'UTC',
+  Stdlib::Host               $zabbix_host              = $facts['networking']['fqdn'],
+  Stdlib::Port               $zabbix_port              = 10051,
+  String                     $cache_size               = '8M',
+  String                     $history_index_cache_size = '4M',
+  String                     $trend_cache_size         = '4M',
+  String                     $value_cache_size         = '8M',
+  Stdlib::Absolutepath       $log_file                 = '/var/log/zabbix/zabbix_server.log',
+  Stdlib::Absolutepath       $mysql_schema             = '/usr/share/doc/zabbix-sql-scripts/mysql/create.sql.gz',
+  String                     $charset                  = 'utf8mb4',
+  String                     $collate                  = 'utf8mb4_bin',
+  String                     $import_cat_cmd           = 'zcat',
+  Integer[1, 1000]           $pollers                  = 5,
+  Integer[1, 1000]           $pingers                  = 1,
+  Integer[1, 1000]           $pollers_unreachable      = 1,
+  Integer[1, 1000]           $proxy_pollers            = 1,
+  Integer[1, 1000]           $trappers                 = 5,
+  Integer[1, 30]             $timeout                  = 3,
+  Stdlib::Absolutepath       $approot                  = '/srv/www',
+  String                     $api_user                 = 'user',
+  String                     $api_password             = 'password',
+  String                     $admin_password           = 'zabbix',
+  Integer                    $default_group_ids        = 2,
+  Integer                    $default_template_ids     = 10001,
+  Stdlib::Unixpath           $icann_nodes_repo         = '/etc/hieradata',
+  Optional[Stdlib::Unixpath] $ssl_chain                = undef,
 ) {
-  ensure_packages([
-      'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts',
-      'snmp-mibs-downloader', 'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
-      'python3-yaml',
+  stdlib::ensure_packages([
+    'zabbix-server-mysql', 'zabbix-frontend-php', 'zabbix-sql-scripts',
+    'snmp-mibs-downloader', 'php-ldap', 'php-bcmath', 'php-mbstring', 'php-xml',
+    'python3-yaml',
   ])
   python::pip { 'pyzabbix':
     ensure       => '1.3.1',
@@ -187,15 +189,17 @@ class zabbix_server (
     line    => 'TLS_REQCERT never',
     require => File['/etc/ldap/ldap.conf'],
   }
+  $_ssl_chain = $ssl_chain.then |$chain| { { 'ssl_chain' => $chain } }
   include apache
   apache::vhost {
     default:
       servername          => $zabbix_host,
       docroot             => "${approot}/",
-      additional_includes => ['/etc/zabbix/apache.conf',];
+      additional_includes => ['/etc/zabbix/apache.conf'];
     "${zabbix_host} non-ssl":
       port => 80;
     $zabbix_host:
+      *                    => $_ssl_chain,
       port                 => 443,
       ssl                  => true,
       ssl_cert             => $ssl_cert,

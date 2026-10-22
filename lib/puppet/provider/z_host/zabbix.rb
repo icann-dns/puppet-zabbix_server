@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 
 # check out the following blog serious for info on greating type/providers
@@ -9,7 +11,7 @@ Puppet::Type.type(:z_host).provide(:zabbix) do
   mk_resource_methods
 
   def initialize(value = {})
-    super(value)
+    super
     @property_flush = {}
   end
 
@@ -54,7 +56,7 @@ Puppet::Type.type(:z_host).provide(:zabbix) do
 
   def flush
     @groupids =  @property_flush.key?(:groupids) ? @property_flush[:groupids] : @resource[:groupids]
-    @templateids =  @property_flush.key?(:templateids) ? @property_flush[:templateids] : @resource[:templateids]
+    @templateids = @property_flush.key?(:templateids) ? @property_flush[:templateids] : @resource[:templateids]
     if @property_flush[:ensure] == :absent
       zabbix_host('--delete', '--node', @resource[:name])
     else
