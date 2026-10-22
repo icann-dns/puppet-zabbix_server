@@ -29,9 +29,9 @@ This module also requires the apache module to configuer the zabbix vhost
 
 ### Setup Requirements
 
-* This modules needs to `zabbix (0.9.8)` installed on the puppet master. 
+* This modules needs to `zabbix (0.9.8)` installed on the puppet master.
 
-you can install this manully with 
+you can install this manully with
 ```bash
 sudo pupetserver gem install zabbix -v 0.9.8
 ```
@@ -83,7 +83,7 @@ node /\.servers\.example\.com$/ {
 * `db_password` (String, Default: 'changeme'): The password to use for creating the databaser
 * `php_timezone` (String, Default: 'UTC'): The timezone to use in php
 * `zabbix_host` (Stdlib::Host, Default: $::fqdn): The zabbix host fqdn used for vhosts
-* `zabbix_port` (Stdlib::Port, Default: 10051): The port zabbix will use to pole 
+* `zabbix_port` (Stdlib::Port, Default: 10051): The port zabbix will use to pole
 * `cache_size` (String, Default: '128M'):  Memory allocation params
 * `history_index_cache_size` (String, Default: '16M'): Memory allocation params
 * `trend_cache_size` (String, Default: '16M'): Memory allocation params
