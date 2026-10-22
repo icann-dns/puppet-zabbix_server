@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'English'
 Puppet::Type.newtype(:z_host) do
   @doc = 'This type provides the capability to manage hosts in zabbix'
@@ -6,7 +8,7 @@ Puppet::Type.newtype(:z_host) do
 
   newparam(:host, namevar: true) do
     desc 'the FQFN'
-    newvalues(%r{[\w\-\.]+})
+    newvalues(%r{[\w\-.]+})
   end
 
   newproperty(:groupids, array_matching: :all) do
@@ -31,7 +33,7 @@ Puppet::Type.newtype(:z_host) do
     desc 'whether to monitor the host'
     newvalue(:true)
     newvalue(:false)
-    munge do |value|
+    munge do |_value|
       :true
     end
   end
@@ -41,7 +43,7 @@ Puppet::Type.newtype(:z_host) do
     if %r{^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$} =~ addr
       return $LAST_MATCH_INFO.captures.all? do |i|
         i = i.to_i
-        i >= 0 && i <= 255
+        i.between?(0, 255)
       end
     end
     false
@@ -53,9 +55,10 @@ Puppet::Type.newtype(:z_host) do
     return true if %r{\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*)?\Z} =~ addr
     return true if %r{\A::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*)?\Z} =~ addr
     # IPv6 (IPv4 compat)
-    return true if %r{\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:} =~ addr && valid_ipv4?($')
-    return true if %r{\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?} =~ addr && valid_ipv4?($')
-    return true if %r{\A::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?} =~ addr && valid_ipv4?($')
+    return true if %r{\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:} =~ addr && valid_ipv4?(Regexp.last_match.post_match)
+    return true if %r{\A[\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?} =~ addr && valid_ipv4?(Regexp.last_match.post_match)
+    return true if %r{\A::([\dA-Fa-f]{1,4}(:[\dA-Fa-f]{1,4})*:)?} =~ addr && valid_ipv4?(Regexp.last_match.post_match)
+
     false
   end
 end

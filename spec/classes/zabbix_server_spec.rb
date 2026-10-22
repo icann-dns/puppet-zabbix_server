@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'zabbix_server' do
@@ -40,6 +42,7 @@ describe 'zabbix_server' do
       describe 'check default config' do
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_python__pip('pyzabbix').with_ensure('1.3.1') }
+
         it do
           is_expected.to contain_mysql__db('zabbix').with(
             user: 'zabbix',
@@ -51,90 +54,105 @@ describe 'zabbix_server' do
             import_cat_cmd: 'zcat',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('zabbix_port').with(
             setting: 'ListenPort',
             value: '10051',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('zabbix_db').with(
             setting: 'DBName',
             value: 'zabbix',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('zabbix_dbhost').with(
             setting: 'DBHost',
             value: 'localhost',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('zabbix_dbport').with(
             setting: 'DBPort',
             value: '3306',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('zabbix_dbpassword').with(
             setting: 'DBPassword',
             value: 'changeme',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('cache_size').with(
             setting: 'CacheSize',
             value: '8M',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('value_cache_size').with(
             setting: 'ValueCacheSize',
             value: '8M',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('log_file').with(
             setting: 'LogFile',
             value: '/var/log/zabbix/zabbix_server.log',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('pollers').with(
             setting: 'StartPollers',
             value: '5',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('pingers').with(
             setting: 'StartPingers',
             value: '1',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('pollers_unreachable').with(
             setting: 'StartPollersUnreachable',
             value: '1',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('trappers').with(
             setting: 'StartTrappers',
             value: '5',
           )
         end
+
         it do
           is_expected.to contain_ini_setting('timeout').with(
             setting: 'Timeout',
             value: '3',
           )
         end
+
         it do
           is_expected.to contain_service('zabbix-server').with(
             ensure: 'running',
             enable: true,
           )
         end
+
         it do
           is_expected.to contain_file('/usr/local/bin/zabbix_host.py').with(
             ensure: 'file',
@@ -145,6 +163,7 @@ describe 'zabbix_server' do
             %r{'--template-ids',\s+default='10001'}x,
           )
         end
+
         it do
           is_expected.to contain_file('/usr/local/bin/zabbix_api_setup.py').with(
             ensure: 'file',
@@ -159,6 +178,7 @@ describe 'zabbix_server' do
             %r{ZABBIX_HOST\s+=\s+'http://zabbix-server.example.com'},
           )
         end
+
         it do
           is_expected.to contain_file('/etc/zabbix/apache.conf').with(
             ensure: 'file',
@@ -168,6 +188,7 @@ describe 'zabbix_server' do
             %r{php_value date.timezone UTC},
           )
         end
+
         it do
           is_expected.to contain_file('/etc/zabbix/web/zabbix.conf.php').with(
             ensure: 'file',
@@ -190,15 +211,18 @@ describe 'zabbix_server' do
             %r{\$ZBX_SERVER_NAME\s+=\s+'zabbix-server.example.com';},
           )
         end
+
         it do
           is_expected.to contain_file('/etc/ldap/ldap.conf').with_ensure('file')
         end
+
         it do
           is_expected.to contain_file_line('Append to /etc/ldap/ldap.conf').with(
             path: '/etc/ldap/ldap.conf',
             line: 'TLS_REQCERT never',
           )
         end
+
         it do
           is_expected.to contain_apache__vhost(
             'zabbix-server.example.com non-ssl',
@@ -209,6 +233,7 @@ describe 'zabbix_server' do
             additional_includes: ['/etc/zabbix/apache.conf'],
           )
         end
+
         it do
           is_expected.to contain_apache__vhost('zabbix-server.example.com').with(
             servername: 'zabbix-server.example.com',
@@ -223,6 +248,7 @@ describe 'zabbix_server' do
             ssl_cipher: 'EECDH+AESGCM:EDH+AESGCM',
           )
         end
+
         it do
           is_expected.to contain_exec('/usr/local/bin/zabbix_api_setup.py').with(
             command: '/usr/local/bin/zabbix_api_setup.py && touch /etc/zabbix/api_created',
@@ -230,11 +256,14 @@ describe 'zabbix_server' do
           )
         end
       end
+
       describe 'Change Defaults' do
         context 'db_host' do
-          before(:each) { params.merge!(db_host: 'foo.bar') }
+          before { params.merge!(db_host: 'foo.bar') }
+
           it { is_expected.to compile }
           it { is_expected.to contain_mysql__db('zabbix').with_host('foo.bar') }
+
           it do
             is_expected.to contain_file(
               '/etc/zabbix/web/zabbix.conf.php',
@@ -242,6 +271,7 @@ describe 'zabbix_server' do
               %r{\$DB\['SERVER'\]\s+=\s+'foo.bar';},
             )
           end
+
           it do
             is_expected.to contain_ini_setting('zabbix_dbhost').with(
               setting: 'DBHost',
@@ -249,9 +279,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'db_port' do
-          before(:each) { params.merge!(db_port: 42) }
+          before { params.merge!(db_port: 42) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file(
               '/etc/zabbix/web/zabbix.conf.php',
@@ -259,6 +292,7 @@ describe 'zabbix_server' do
               %r{\$DB\['PORT'\]\s+=\s+'42';},
             )
           end
+
           it do
             is_expected.to contain_ini_setting('zabbix_dbport').with(
               setting: 'DBPort',
@@ -266,9 +300,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'db_name' do
-          before(:each) { params.merge!(db_name: 'foobar') }
+          before { params.merge!(db_name: 'foobar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_mysql__db('foobar').with(
               user: 'zabbix',
@@ -276,6 +313,7 @@ describe 'zabbix_server' do
               host: 'localhost',
             )
           end
+
           it do
             is_expected.to contain_file(
               '/etc/zabbix/web/zabbix.conf.php',
@@ -283,6 +321,7 @@ describe 'zabbix_server' do
               %r{\$DB\['DATABASE'\]\s+=\s+'foobar';},
             )
           end
+
           it do
             is_expected.to contain_ini_setting('zabbix_db').with(
               setting: 'DBName',
@@ -290,10 +329,13 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'db_user' do
-          before(:each) { params.merge!(db_user: 'foobar') }
+          before { params.merge!(db_user: 'foobar') }
+
           it { is_expected.to compile }
           it { is_expected.to contain_mysql__db('zabbix').with_user('foobar') }
+
           it do
             is_expected.to contain_file(
               '/etc/zabbix/web/zabbix.conf.php',
@@ -302,12 +344,16 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'db_password' do
-          before(:each) { params.merge!(db_password: 'foobar') }
+          before { params.merge!(db_password: 'foobar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_mysql__db('zabbix').with_password('foobar')
           end
+
           it do
             is_expected.to contain_file(
               '/etc/zabbix/web/zabbix.conf.php',
@@ -315,6 +361,7 @@ describe 'zabbix_server' do
               %r{\$DB\['PASSWORD'\]\s+=\s+'foobar';},
             )
           end
+
           it do
             is_expected.to contain_ini_setting('zabbix_dbpassword').with(
               setting: 'DBPassword',
@@ -322,9 +369,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'php_timezone' do
-          before(:each) { params.merge!(php_timezone: 'Foo/Bar') }
+          before { params.merge!(php_timezone: 'Foo/Bar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file('/etc/zabbix/apache.conf').with(
               ensure: 'file',
@@ -335,9 +385,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'zabbix_host' do
-          before(:each) { params.merge!(zabbix_host: 'foo.bar') }
+          before { params.merge!(zabbix_host: 'foo.bar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file(
               '/etc/zabbix/web/zabbix.conf.php',
@@ -345,6 +398,7 @@ describe 'zabbix_server' do
               %r{\$ZBX_SERVER\s+=\s+'foo.bar';},
             )
           end
+
           it do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_api_setup.py',
@@ -353,9 +407,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'zabbix_port' do
-          before(:each) { params.merge!(zabbix_port: 42) }
+          before { params.merge!(zabbix_port: 42) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file(
               '/etc/zabbix/web/zabbix.conf.php',
@@ -364,9 +421,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'cache_size' do
-          before(:each) { params.merge!(cache_size: '42M') }
+          before { params.merge!(cache_size: '42M') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_ini_setting('cache_size').with(
               setting: 'CacheSize',
@@ -374,9 +434,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'value_cache_size' do
-          before(:each) { params.merge!(value_cache_size: '42M') }
+          before { params.merge!(value_cache_size: '42M') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_ini_setting('value_cache_size').with(
               setting: 'ValueCacheSize',
@@ -384,9 +447,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'log_file' do
-          before(:each) { params.merge!(log_file: '/foo/bar') }
+          before { params.merge!(log_file: '/foo/bar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_ini_setting('log_file').with(
               setting: 'LogFile',
@@ -394,9 +460,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'pollers' do
-          before(:each) { params.merge!(pollers: 42) }
+          before { params.merge!(pollers: 42) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_ini_setting('pollers').with(
               setting: 'StartPollers',
@@ -404,9 +473,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'pingers' do
-          before(:each) { params.merge!(pingers: 42) }
+          before { params.merge!(pingers: 42) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_ini_setting('pingers').with(
               setting: 'StartPingers',
@@ -414,9 +486,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'pollers_unreachable' do
-          before(:each) { params.merge!(pollers_unreachable: 42) }
+          before { params.merge!(pollers_unreachable: 42) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_ini_setting('pollers_unreachable').with(
               setting: 'StartPollersUnreachable',
@@ -424,9 +499,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'trappers' do
-          before(:each) { params.merge!(trappers: 42) }
+          before { params.merge!(trappers: 42) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_ini_setting('trappers').with(
               setting: 'StartTrappers',
@@ -434,9 +512,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'timeout' do
-          before(:each) { params.merge!(timeout: 21) }
+          before { params.merge!(timeout: 21) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_ini_setting('timeout').with(
               setting: 'Timeout',
@@ -444,23 +525,30 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'approot' do
-          before(:each) { params.merge!(approot: '/foo/bar') }
+          before { params.merge!(approot: '/foo/bar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_apache__vhost(
               'zabbix-server.example.com non-ssl',
             ).with_docroot('/foo/bar/')
           end
+
           it do
             is_expected.to contain_apache__vhost(
               'zabbix-server.example.com',
             ).with_docroot('/foo/bar/')
           end
         end
+
         context 'api_user' do
-          before(:each) { params.merge!(api_user: 'foobar') }
+          before { params.merge!(api_user: 'foobar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_api_setup.py',
@@ -469,9 +557,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'api_password' do
-          before(:each) { params.merge!(api_password: 'foobar') }
+          before { params.merge!(api_password: 'foobar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_api_setup.py',
@@ -480,9 +571,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'admin_password' do
-          before(:each) { params.merge!(admin_password: 'foobar') }
+          before { params.merge!(admin_password: 'foobar') }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_api_setup.py',
@@ -491,9 +585,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'default_group_ids' do
-          before(:each) { params.merge!(default_group_ids: 42) }
+          before { params.merge!(default_group_ids: 42) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_host.py',
@@ -502,9 +599,12 @@ describe 'zabbix_server' do
             )
           end
         end
+
         context 'default_template_ids' do
-          before(:each) { params.merge!(default_template_ids: 42) }
+          before { params.merge!(default_template_ids: 42) }
+
           it { is_expected.to compile }
+
           it do
             is_expected.to contain_file(
               '/usr/local/bin/zabbix_host.py',
@@ -514,93 +614,137 @@ describe 'zabbix_server' do
           end
         end
       end
+
       describe 'check bad type' do
         context 'db_host' do
-          before(:each) { params.merge!(db_host: true) }
+          before { params.merge!(db_host: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'db_port' do
-          before(:each) { params.merge!(db_port: true) }
+          before { params.merge!(db_port: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'db_name' do
-          before(:each) { params.merge!(db_name: true) }
+          before { params.merge!(db_name: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'db_user' do
-          before(:each) { params.merge!(db_user: true) }
+          before { params.merge!(db_user: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'db_password' do
-          before(:each) { params.merge!(db_password: true) }
+          before { params.merge!(db_password: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'php_timezone' do
-          before(:each) { params.merge!(php_timezone: true) }
+          before { params.merge!(php_timezone: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'zabbix_host' do
-          before(:each) { params.merge!(zabbix_host: true) }
+          before { params.merge!(zabbix_host: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'zabbix_port' do
-          before(:each) { params.merge!(zabbix_port: true) }
+          before { params.merge!(zabbix_port: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'cache_size' do
-          before(:each) { params.merge!(cache_size: true) }
+          before { params.merge!(cache_size: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'value_cache_size' do
-          before(:each) { params.merge!(value_cache_size: true) }
+          before { params.merge!(value_cache_size: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'log_file' do
-          before(:each) { params.merge!(log_file: true) }
+          before { params.merge!(log_file: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'pollers' do
-          before(:each) { params.merge!(pollers: true) }
+          before { params.merge!(pollers: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'pingers' do
-          before(:each) { params.merge!(pingers: true) }
+          before { params.merge!(pingers: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'pollers_unreachable' do
-          before(:each) { params.merge!(pollers_unreachable: true) }
+          before { params.merge!(pollers_unreachable: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'trappers' do
-          before(:each) { params.merge!(trappers: true) }
+          before { params.merge!(trappers: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'timeout' do
-          before(:each) { params.merge!(timeout: true) }
+          before { params.merge!(timeout: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'approot' do
-          before(:each) { params.merge!(approot: true) }
+          before { params.merge!(approot: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'api_user' do
-          before(:each) { params.merge!(api_user: true) }
+          before { params.merge!(api_user: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'api_password' do
-          before(:each) { params.merge!(api_password: true) }
+          before { params.merge!(api_password: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'admin_password' do
-          before(:each) { params.merge!(admin_password: true) }
+          before { params.merge!(admin_password: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'default_group_ids' do
-          before(:each) { params.merge!(default_group_ids: true) }
+          before { params.merge!(default_group_ids: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
+
         context 'default_template_ids' do
-          before(:each) { params.merge!(default_template_ids: true) }
+          before { params.merge!(default_template_ids: true) }
+
           it { is_expected.to raise_error(Puppet::Error) }
         end
       end
